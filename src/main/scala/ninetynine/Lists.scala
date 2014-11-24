@@ -4,10 +4,6 @@ import scala.annotation.tailrec
 
 object Lists {
 
-  // P01 (*) Find the last element of a list.
-  //     Example:
-  //     scala> last(List(1, 1, 2, 3, 5, 8))
-  //     res0: Int = 8
   object P01 {
 
     def last[E](xs: List[E]): E = {
@@ -23,10 +19,6 @@ object Lists {
     }
   }
 
-  // P02 (*) Find the last but one element of a list.
-  //     Example:
-  //     scala> penultimate(List(1, 1, 2, 3, 5, 8))
-  //     res0: Int = 5
   object P02 {
 
     def penultimate[E](xs: List[E]): E = {
@@ -45,13 +37,6 @@ object Lists {
       xs.reverse.tail.head
   }
 
-  // P03 (*) Find the Kth element of a list.
-  //     By convention, the first element in the list is element 0.
-  //
-  //     Example:
-  //     scala> nth(2, List(1, 1, 2, 3, 5, 8))
-  //     res0: Int = 2
-
   object P03 {
 
     def nth[E](n: Int, xs: List[E]): E = {
@@ -68,10 +53,6 @@ object Lists {
       xs.drop(n).head
   }
 
-  // P04 (*) Find the number of elements of a list.
-  //     Example:
-  //     scala> length(List(1, 1, 2, 3, 5, 8))
-  //     res0: Int = 6
   object P04 {
 
     def length[E](xs: List[E]): Int = {
@@ -89,10 +70,6 @@ object Lists {
       xs.foldLeft(0)((acc, _) => acc + 1)
   }
 
-  // P05 (*) Reverse a list.
-  //     Example:
-  //     scala> reverse(List(1, 1, 2, 3, 5, 8))
-  //     res0: List[Int] = List(8, 5, 3, 2, 1, 1)
   object P05 {
 
     def reverse[E](xs: List[E]): List[E] = {
@@ -110,10 +87,6 @@ object Lists {
       xs.foldLeft(List.empty[E])((acc, e) => e :: acc)
   }
 
-  // P06 (*) Find out whether a list is a palindrome.
-  //     Example:
-  //     scala> isPalindrome(List(1, 2, 3, 2, 1))
-  //     res0: Boolean = true
   object P06 {
 
     def isPalindrome[E](xs: List[E]): Boolean =
@@ -126,10 +99,6 @@ object Lists {
     }
   }
 
-  // P07 (**) Flatten a nested list structure.
-  //     Example:
-  //     scala> flatten(List(List(1, 1), 2, List(3, List(5, 8))))
-  //     res0: List[Any] = List(1, 1, 2, 3, 5, 8)
   object P07 {
 
     def flatten(xs: List[_]): List[_] = {
@@ -148,14 +117,6 @@ object Lists {
     }
   }
 
-  // P08 (**) Eliminate consecutive duplicates of list elements.
-  //     If a list contains repeated elements they should be replaced with a
-  //     single copy of the element.  The order of the elements should not be
-  //     changed.
-  //
-  //     Example:
-  //     scala> compress(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e))
-  //     res0: List[Symbol] = List('a, 'b, 'c, 'a, 'd, 'e)
   object P08 {
 
     def compress[E](xs: List[E]): List[E] = {
@@ -189,6 +150,53 @@ object Lists {
 
       doCompress(xs, Nil)
     }
+  }
+
+  object P09 {
+
+    def pack(xs: List[Symbol]): List[List[Symbol]] =
+      xs.foldLeft(List.empty[List[Symbol]]) {
+        (acc, s) =>
+          acc match {
+            case Nil => (s :: Nil) :: acc
+            case h :: t =>
+              // h can never be empty.  Ideally is represented by
+              // scalaz.NonEmptyList
+              h.head == s match {
+                case true => (s :: h) :: t
+                case false => (s :: Nil) :: h :: t
+              }
+          }
+      }
+        .reverse
+  }
+
+  object P10 {
+
+    def encode(xs: List[Symbol]): List[(Int, Symbol)] =
+      for (symbols <- P09.pack(xs)) yield
+        symbols.size -> symbols.head
+  }
+
+  object P11 {
+
+    def encodeModified(xs: List[Symbol]): List[Any] =
+      for (t@(size, elem) <- P10.encode(xs)) yield
+        size == 1 match {
+          case true => elem
+          case false => t
+        }
+
+  }
+
+  object P12 {
+
+    def decode(xs: List[(Int, Symbol)]): List[Symbol] =
+      for {
+        (size, elem) <- xs
+        elems <- List.fill(size)(elem)
+      } yield
+        elems
   }
 
 }
