@@ -63,4 +63,33 @@ class ListsSpec extends Specification {
         List('a, 'b, 'c, 'a, 'd, 'e)
     }
   }
+
+  "Packing consecutive duplicates into sublists of " +
+    "List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)" should {
+    "yield List(List('a, 'a, 'a, 'a), List('b), List('c, 'c), List('a, 'a), List('d), List('e, 'e, 'e, 'e))" >> {
+      Lists.P09.pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)) ====
+        List(List('a, 'a, 'a, 'a), List('b), List('c, 'c), List('a, 'a), List('d), List('e, 'e, 'e, 'e))
+    }
+  }
+
+  "Run-length encoding of List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)" should {
+    "yield List((4,'a), (1,'b), (2,'c), (2,'a), (1,'d), (4,'e))" >> {
+      Lists.P10.encode(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)) ====
+        List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))
+    }
+  }
+
+  "Modified run-length encoding of List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)" should {
+    "yield List((4,'a), 'b, (2,'c), (2,'a), 'd, (4,'e))" >> {
+      Lists.P11.encodeModified(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)) ===
+        List((4, 'a), 'b, (2, 'c), (2, 'a), 'd, (4, 'e))
+    }
+  }
+
+  "Decoding run-length encoded List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))" should {
+    "yield List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)" >> {
+      Lists.P12.decode(List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))) ====
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)
+    }
+  }
 }
