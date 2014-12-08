@@ -4,8 +4,6 @@ import org.specs2.mutable.Specification
 
 class ListsSpec extends Specification {
 
-  sequential
-
   "Last element in List(1, 1, 2, 3, 5, 8)" should {
     "be 8" >> {
       Lists.P01.last(List(1, 1, 2, 3, 5, 8)) ==== 8
@@ -90,6 +88,66 @@ class ListsSpec extends Specification {
     "yield List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)" >> {
       Lists.P12.decode(List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))) ====
         List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)
+    }
+  }
+
+  "Run-length encoding of List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)" should {
+    "yield List((4,'a), (1,'b), (2,'c), (2,'a), (1,'d), (4,'e))" >> {
+      Lists.P13.encodeDirect(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)) ====
+        List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))
+    }
+  }
+
+  "Duplicating each element in List('a, 'b, 'c, 'c, 'd)" should {
+    "yield List('a, 'a, 'b, 'b, 'c, 'c, 'c, 'c, 'd, 'd)" >> {
+      Lists.P14.duplicate(List('a, 'b, 'c, 'c, 'd)) ====
+        List('a, 'a, 'b, 'b, 'c, 'c, 'c, 'c, 'd, 'd)
+    }
+  }
+
+  "Duplicating each element 3 times in List('a, 'b, 'c, 'c, 'd)" should {
+    "yield List('a, 'a, 'a, 'b, 'b, 'b, 'c, 'c, 'c, 'c, 'c, 'c, 'd, 'd, 'd)" >> {
+      Lists.P15.duplicateN(3, List('a, 'b, 'c, 'c, 'd)) ====
+        List('a, 'a, 'a, 'b, 'b, 'b, 'c, 'c, 'c, 'c, 'c, 'c, 'd, 'd, 'd)
+    }
+  }
+
+  "Dropping every 3rd element from List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k))" should {
+    "yield List('a, 'b, 'd, 'e, 'g, 'h, 'j, 'k)" >> {
+      Lists.P16.drop(3, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)) ====
+        List('a, 'b, 'd, 'e, 'g, 'h, 'j, 'k)
+    }
+  }
+
+  "Splitting List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k) into two lists on the third element" should {
+    "yield (List('a, 'b, 'c),List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k)" >> {
+      Lists.P17.split(3, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)) ====
+        (List('a, 'b, 'c), List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
+    }
+  }
+
+  "Slicing a list" should {
+    "yield from ith index inclusive to the jth index exclusive" >> {
+      Lists.P18.slice(3, 7, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)) ====
+        List('d, 'e, 'f, 'g)
+    }
+  }
+
+  "Rotating a list N places to the left" should {
+    "yield rotated list to left when N > 0" >> {
+      Lists.P19.rotate(3, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)) ====
+        List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k, 'a, 'b, 'c)
+    }
+    "yield wrapped rotated list to left when N < 0" >> {
+      Lists.P19.rotate(-2, List('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i, 'j, 'k)) ====
+        List('j, 'k, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i)
+    }
+  }
+
+  "Removing 1st element from List('a, 'b, 'c, 'd)" should {
+    "yield (List('a, 'c, 'd),'b)" >> {
+      Lists.P20.removeAt(1, List('a, 'b, 'c, 'd)) ====
+        (List('a, 'c, 'd), 'b)
     }
   }
 }

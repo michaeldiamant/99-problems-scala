@@ -199,4 +199,137 @@ object Lists {
         elems
   }
 
+  object P13 {
+
+    def encodeDirect(xs: List[Symbol]): List[(Int, Symbol)] =
+      xs.foldLeft(List.empty[(Int, Symbol)]) {
+        (acc, s) =>
+          acc match {
+            case Nil => 1 -> s :: acc
+            case (count, ss) :: t =>
+              // h can never be empty.  Ideally is represented by
+              // scalaz.NonEmptyList
+              ss == s match {
+                case true => count + 1 -> s :: t
+                case false => 1 -> s :: count -> ss :: t
+              }
+          }
+      }
+        .reverse
+  }
+
+  object P14 {
+
+    def duplicate[E](xs: List[E]): List[E] =
+      for {
+        e <- xs
+        ee <- e :: e :: Nil
+      } yield
+        ee
+  }
+
+  object P15 {
+
+    def duplicateN[E](n: Int, xs: List[E]): List[E] =
+      for {
+        e <- xs
+        ee <- List.fill(n)(e)
+      } yield
+        ee
+  }
+
+  object P16 {
+
+    def drop[E](nth: Int, xs: List[E]): List[E] =
+      for {
+        (e, i) <- xs.zipWithIndex
+        if (i + 1) % nth != 0
+      } yield
+        e
+  }
+
+  object P17 {
+
+    def split[E](n: Int, xs: List[E]): (List[E], List[E]) = {
+      @tailrec
+      def doSplit(xss: List[E], acc: List[E]): (List[E], List[E]) =
+        xss match {
+          case Nil => acc.reverse -> Nil
+          case h :: t if acc.size < n => doSplit(t, h :: acc)
+          case _ => acc.reverse -> xss
+
+        }
+
+      doSplit(xs, Nil)
+    }
+  }
+
+  object P18 {
+
+    def slice[E](i: Int, j: Int, xs: List[E]): List[E] = {
+      @tailrec
+      def doSlice(xss: List[E], acc: List[E], elementsDiscarded: Int): List[E] =
+        elementsDiscarded >= i match {
+          case true =>
+            elementsDiscarded < j match {
+              case true =>
+                xss match {
+                  case Nil => acc.reverse
+                  case h :: t => doSlice(t, h :: acc, elementsDiscarded + 1)
+                }
+              case false => acc.reverse
+            }
+          case false => doSlice(xss.tail, acc, elementsDiscarded + 1)
+        }
+
+      doSlice(xs, Nil, 0)
+    }
+  }
+
+  object P19 {
+
+    def rotate[E](shift: Int, xs: List[E]): List[E] = {
+      @tailrec
+      def doRotate(xss: List[E], acc: List[E]): List[E] =
+        (xss, acc.size < shift.abs) match {
+          case (Nil, _) =>
+            shift > 0 match {
+              case true => xss ::: acc.reverse
+              case false => acc ::: xss.reverse
+            }
+          case (h :: t, true) => doRotate(t, h :: acc)
+          case (_, false) =>
+            shift > 0 match {
+              case true => xss ::: acc.reverse
+              case false => acc ::: xss.reverse
+            }
+        }
+
+      doRotate(
+        shift > 0 match {
+          case true => xs
+          case false => xs.reverse
+        },
+        Nil)
+    }
+  }
+
+  object P20 {
+
+    def removeAt[E](i: Int, xs: List[E]): (List[E], E) = {
+      @tailrec
+      def doRemoveAt(xss: List[E], acc: List[E]): (List[E], E) =
+        (acc.size == i, xss) match {
+          // Ignoring case where list is smaller than i
+          // i.e. case (_, Nil) =>
+          case (_, Nil) => sys.error("Unsupported use case")
+          case (true, h :: t) => (acc.reverse ::: t) -> h
+          case (false, h :: t) => doRemoveAt(t, h :: acc)
+        }
+
+      doRemoveAt(xs, Nil)
+    }
+
+  }
+
 }
